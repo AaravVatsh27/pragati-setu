@@ -1,7 +1,13 @@
 node_modules
-.env
-.env.local
-.env.*.local
+
+# Environment files
+**/.env
+**/.env.*
+
+# Local dotfiles and dot-directories
+**/.*
+!**/.gitignore
+
 .DS_Store
 dist
 build
@@ -15,3 +21,4 @@ frontend/test-*.ts
 frontend/test_*.js
 frontend/test_*.ts
 frontend/src/app/decision-passport/test_file.txt
+.vercel
