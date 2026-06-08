@@ -1,5 +1,6 @@
 import { neon } from '@neondatabase/serverless';
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 let _sql: any = null;
 
 function getDb() {
