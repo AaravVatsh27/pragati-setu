@@ -33,22 +33,6 @@ export default function RootLayout({
 }>) {
     return (
         <html lang="en" className={`${cormorant.variable} ${sora.variable} ${jetbrains.variable}`}>
-            <head>
-                <script
-                    data-noptimize="1"
-                    data-cfasync="false"
-                    dangerouslySetInnerHTML={{
-                        __html: `(function () {
-        var script =
-          document.createElement("script");
-        script.async = 1;
-        script.src =
-          'https://emrld.ltd/NTEwMTQz.js?t=510143';
-        document.head.appendChild(script);
-      })();`
-                    }}
-                />
-            </head>
             <body className="font-sans antialiased text-text-primary bg-bg-void selection:bg-saffron/30 overflow-x-hidden">
                 <Providers>
                     {children}
