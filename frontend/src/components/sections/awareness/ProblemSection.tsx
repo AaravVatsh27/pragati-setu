@@ -7,7 +7,9 @@ const Word = ({ children, progress, range }: { children: string; progress: Motio
     const opacity = useTransform(progress, range, [0.2, 1]);
     return (
         <span className="relative mr-3 lg:mr-5 inline-block">
-            <span className="absolute opacity-20">{children}</span>
+            {/* aria-hidden prevents this ghost from being read twice by screen readers
+                and from appearing doubled in SSR/crawlers/plain-text renders */}
+            <span className="absolute opacity-20" aria-hidden="true">{children}</span>
             <motion.span style={{ opacity }}>{children}</motion.span>
         </span>
     );

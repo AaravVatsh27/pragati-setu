@@ -54,7 +54,10 @@ const FinalCTASection: React.FC = () => (
                 transition={{ delay: 0.2, duration: 0.8 }}
                 className="font-sans text-lg text-white/80 mb-12 max-w-[460px] leading-relaxed"
             >
-                Join 12,847 travelers who plan smarter.
+                {/* FIX: "Join 12,847 travelers" was a hardcoded fake number —
+                    completely inconsistent with the rest of the site showing 1 guide,
+                    1 passport. Replaced with honest value proposition copy. */}
+                Stop guessing. Start traveling with five verified signals behind every decision.
             </motion.p>
 
             <motion.div
@@ -64,21 +67,25 @@ const FinalCTASection: React.FC = () => (
                 transition={{ delay: 0.35, duration: 0.8 }}
                 className="flex flex-col items-center gap-5"
             >
-                <motion.button
-                    whileHover={{
-                        y: -3,
-                        boxShadow: "0 4px 0 rgba(0,0,0,0.18), 0 12px 32px rgba(0,0,0,0.30), 0 28px 60px rgba(0,0,0,0.22)",
-                    }}
-                    whileTap={{ y: 0, boxShadow: "0 2px 0 rgba(0,0,0,0.18), 0 4px 12px rgba(0,0,0,0.20)" }}
-                    className="flex items-center gap-3 bg-white text-saffron font-sans font-bold text-base px-14 py-5 rounded-[4px] transition-all group"
-                    style={{
-                        boxShadow: "0 2px 0 rgba(0,0,0,0.14), 0 8px 24px rgba(0,0,0,0.22), 0 20px 48px rgba(0,0,0,0.16)",
-                    }}
-                    onClick={() => window.location.href = '/register'}
-                >
-                    Create My Decision Passport
-                    <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
-                </motion.button>
+                {/* FIX: was onClick={() => window.location.href = '/register'}
+                    — hard navigation breaks Next.js client-side routing.
+                    Use Link wrapper instead. */}
+                <Link href="/register">
+                    <motion.button
+                        whileHover={{
+                            y: -3,
+                            boxShadow: "0 4px 0 rgba(0,0,0,0.18), 0 12px 32px rgba(0,0,0,0.30), 0 28px 60px rgba(0,0,0,0.22)",
+                        }}
+                        whileTap={{ y: 0, boxShadow: "0 2px 0 rgba(0,0,0,0.18), 0 4px 12px rgba(0,0,0,0.20)" }}
+                        className="flex items-center gap-3 bg-white text-saffron font-sans font-bold text-base px-14 py-5 rounded-[4px] transition-all group"
+                        style={{
+                            boxShadow: "0 2px 0 rgba(0,0,0,0.14), 0 8px 24px rgba(0,0,0,0.22), 0 20px 48px rgba(0,0,0,0.16)",
+                        }}
+                    >
+                        Create My Decision Passport
+                        <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
+                    </motion.button>
+                </Link>
 
                 <div className="flex flex-col items-center gap-2">
                     <span className="font-mono text-[11px] text-white/60 tracking-[1px]">

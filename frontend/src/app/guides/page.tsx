@@ -1,8 +1,14 @@
 import React from "react";
+import type { Metadata } from "next";
 import PageWrapper from "@/components/PageWrapper";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import { query } from "@/lib/db";
+
+export const metadata: Metadata = {
+    title: "Find a Local Guide",
+    description: "Connect with verified local experts in your destination. Pragati Setu guides speak your language and are background-checked before your trip.",
+};
 import GuidesPageClient, {
     type GuideCardData,
     type GuideCityFilter,

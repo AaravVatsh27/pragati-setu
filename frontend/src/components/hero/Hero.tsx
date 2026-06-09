@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import ParticleField from "./ParticleField";
 import Globe from "./Globe";
 import StatBar from "./StatBar";
-import { ArrowRight, CaretDown, Compass } from "@phosphor-icons/react";
+import { ArrowRight, Compass } from "@phosphor-icons/react";
 import Link from "next/link";
 import type { HomeHeroCard, HomeHeroCardTone, HomeStat } from "@/lib/home-data";
 
@@ -36,9 +36,12 @@ const Hero: React.FC<{
     countriesCovered,
     stats,
 }) => {
-    const countrySummary = countriesCovered > 0
-        ? `${countriesCovered.toLocaleString("en-IN")} covered countries.`
-        : "Live destination coverage, guide signals, and accountable planning.";
+    // FIX: was "1 covered countries" — wrong grammar and exposes raw DB count
+    const countrySummary = countriesCovered === 0
+        ? "Live destination coverage, guide signals, and accountable planning."
+        : countriesCovered === 1
+        ? "1 country covered."
+        : `${countriesCovered.toLocaleString("en-IN")} countries covered.`;
 
     return (
         <section className="relative min-h-screen w-full bg-[#060A12] overflow-hidden flex flex-col justify-between pt-20">
@@ -103,13 +106,17 @@ const Hero: React.FC<{
                             </motion.button>
                         </Link>
 
-                        <Link href="/decision-passport">
+                        {/* "See a Live Demo" removed — it redirected to /decision-passport
+                            which immediately bounces unauthenticated users to /login.
+                            A demo CTA that hits a login wall is the #1 conversion killer.
+                            TODO: replace this with a public sample passport page e.g. /demo */}
+                        <Link href="/pricing">
                             <motion.button
                                 whileHover={{ color: "#D4590A" }}
-                                className="group flex items-center gap-2 text-text-primary font-sans font-medium border-b border-white/30 hover:border-saffron transition-all pb-1"
+                                className="group flex items-center gap-2 text-text-secondary font-sans font-medium hover:text-saffron transition-all text-sm"
                             >
-                                See a Live Demo
-                                <CaretDown size={18} className="group-hover:translate-y-1 transition-transform" />
+                                See pricing & plans
+                                <span className="w-4 h-[1px] bg-current transition-all group-hover:w-6" />
                             </motion.button>
                         </Link>
                     </motion.div>

@@ -192,10 +192,20 @@ const ConfidenceScoresSection: React.FC = () => {
         <section className="relative w-full py-40 bg-[#060A12] overflow-hidden">
             <div className="max-w-[1280px] mx-auto px-6">
                 <div className="mb-24 flex flex-col gap-2">
+                    {/* FIX: "Sample" label added so users understand these are demo scores,
+                        not live scores for their trip. Prevents confusion when scores
+                        don't change between sessions. */}
+                    <span className="font-mono text-[11px] text-text-secondary tracking-[3px] uppercase block mb-2">
+                        Sample · Tokyo, Japan · Mar 2025
+                    </span>
                     <h2 className="text-5xl lg:text-6xl font-display font-black text-text-primary leading-[0.9]">
                         Five Scores. <br />
                         <span className="italic text-saffron">One Certain Decision.</span>
                     </h2>
+                    <p className="font-sans text-sm text-text-secondary mt-3 max-w-md">
+                        Every passport generates five live confidence scores for your exact travel window.
+                        These are sample scores — your passport will reflect your destination and dates.
+                    </p>
                 </div>
 
                 <div className="flex flex-nowrap lg:flex-row items-center justify-center gap-4 lg:gap-8 pb-12 overflow-x-auto lg:overflow-x-visible no-scrollbar">
@@ -207,6 +217,19 @@ const ConfidenceScoresSection: React.FC = () => {
                             total={scores.length}
                         />
                     ))}
+                </div>
+
+                {/* FIX: Added CTA — without this the section is a dead end */}
+                <div className="flex justify-center mt-8">
+                    <Link href="/register">
+                        <motion.button
+                            whileHover={{ scale: 1.04, y: -2 }}
+                            whileTap={{ scale: 0.96 }}
+                            className="px-8 py-3.5 bg-saffron hover:bg-saffron-bright text-text-primary font-sans font-semibold rounded-[4px] text-sm shadow-lg shadow-saffron/30 transition-all"
+                        >
+                            Get your own passport scores →
+                        </motion.button>
+                    </Link>
                 </div>
             </div>
         </section>

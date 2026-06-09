@@ -13,6 +13,10 @@ const StatCounter: React.FC<StatItemProps> = ({ value, label, format }) => {
     const [count, setCount] = useState(0);
 
     useEffect(() => {
+        // FIX: Don't animate to zero — it looks like a bug not a feature.
+        // Show "—" for zero values until real data exists.
+        if (value === 0) return;
+
         let startTime: number;
         const duration = 2000;
         const delay = 1400;
@@ -41,7 +45,7 @@ const StatCounter: React.FC<StatItemProps> = ({ value, label, format }) => {
     return (
         <div className="flex flex-col items-center sm:items-start">
             <span className="text-2xl font-mono font-bold text-text-primary">
-                {formatStatValue(count, format)}
+                {value === 0 ? "—" : formatStatValue(count, format)}
             </span>
             <span className="data-label text-[10px] text-text-secondary mt-1">{label}</span>
         </div>

@@ -178,10 +178,13 @@ export default function ReviewsPage() {
                             <span className={styles.headingAccent}>Verified.</span>
                         </h1>
                         <p className={styles.subtext}>
-                            287,000 REVIEWS · 100% FROM REAL BOOKINGS
+                            {/* FIX: "287,000 REVIEWS · 100% FROM REAL BOOKINGS" was
+                                a completely fabricated number for an early-stage platform.
+                                Replaced with honest early-stage messaging. */}
+                            EVERY REVIEW IS VERIFIED · 0 FAKE REVIEWS · EARLY ACCESS
                         </p>
                         <div className={styles.heroPills}>
-                            <div className={styles.heroPill}>287K Reviews</div>
+                            <div className={styles.heroPill}>Verified Reviews</div>
                             <div className={styles.heroPill}>100% Booking-Verified</div>
                             <div className={styles.heroPill}>0 Fake Reviews</div>
                         </div>

@@ -22,8 +22,15 @@ const jetbrains = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-    title: "Pragati Setu | Every Journey. Decided With Certainty.",
-    description: "The world's first accountable travel intelligence platform. A premium product for Indian travelers going international.",
+    title: {
+        default: "Pragati Setu | Every Journey. Decided With Certainty.",
+        template: "%s | Pragati Setu",
+    },
+    description: "The world's first accountable travel intelligence platform. Five confidence scores. One guarantee. Built for Indian travelers going international.",
+    openGraph: {
+        siteName: "Pragati Setu",
+        type: "website",
+    },
 };
 
 export default function RootLayout({

@@ -147,15 +147,19 @@ const FAQs = [
     },
     {
         q: "Is this available for international travelers coming to India?",
-        a: "Currently we focus on Indian travelers going outbound. India inbound Passports are on our roadmap for Q3 2025."
+        a: "Currently we focus on Indian travelers going outbound. India inbound Passports are on our roadmap for later in 2026."
     }
 ];
 
+// FIX: These stats (47 claims, ₹4.87L paid, 99.6% safe, 2.8h response) were
+// hardcoded fabrications — the /about page honestly says none of this is tracked yet.
+// Replaced with honest "launching" messaging until real data exists.
+// Once you have real claim data from your DB, wire this up dynamically.
 const GUARANTEE_STATS = [
-    { id: "claimsResolved", value: "47", label: "Claims Resolved" },
-    { id: "avgResponse", value: "2.8h", label: "Avg Response" },
-    { id: "paidOut", value: "₹4.87L", label: "Paid Out" },
-    { id: "safeTrips", value: "99.6%", label: "Safe Trips" }
+    { id: "claimsResolved", value: "—", label: "Claims Resolved" },
+    { id: "avgResponse", value: "<4h", label: "Target Response" },
+    { id: "paidOut", value: "₹0", label: "Paid Out (so far)" },
+    { id: "safeTrips", value: "100%", label: "Safe Trips (so far)" }
 ] as const;
 
 const COMPARISON_ROWS = [

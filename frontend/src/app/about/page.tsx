@@ -1,8 +1,14 @@
 import Link from "next/link";
+import type { Metadata } from "next";
 import styles from "./about.module.css";
 import PageWrapper from "@/components/PageWrapper";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
+
+export const metadata: Metadata = {
+    title: "About Us",
+    description: "We build accountable travel intelligence for Indian travelers. Here's what we believe, what we've built, and what we're working toward.",
+};
 import { queryOne } from "@/lib/db";
 
 interface AboutSnapshotRow {
