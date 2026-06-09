@@ -2,8 +2,15 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import PageWrapper from "@/components/PageWrapper";
 import styles from "./flights.module.css";
+import type {
+    Airport,
+    FlightResult,
+    FlightSelection,
+} from "@/lib/flights";
+import { FLIGHT_SELECTION_STORAGE_KEY } from "@/lib/flights";
 
 // ─── Inline SVG icons ──────────────────────────────────────────────────────
 const ArrowLeftIcon = () => (
@@ -27,34 +34,6 @@ const XIcon = () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" 
 const EditIcon = () => <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" /><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" /></svg>;
 const AlertIcon = () => <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 1 0 0 20A10 10 0 0 0 12 2zm1 14H11v-2h2v2zm0-4H11V7h2v5z" /></svg>;
 const ShieldIcon = () => <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg>;
-
-// ─── Types ─────────────────────────────────────────────────────────────────
-interface Airport {
-    code: string;
-    name: string;
-    city: string;
-    country: string;
-}
-
-interface FlightResult {
-    id: string;
-    airline: string;
-    code: string;
-    flightNo: string;
-    departure: string;
-    arrival: string;
-    duration: string;
-    stops: string;
-    price: string;
-    rawPrice: number;
-    onTime: number | null;
-    luggage: string;
-    meal: boolean;
-    confidence: number;
-    recommended: boolean;
-    reason?: string;
-    warning?: string;
-}
 
 // ─── Default airports ──────────────────────────────────────────────────────
 const DEFAULT_FROM: Airport = {
@@ -166,63 +145,12 @@ function FlightArc() {
     );
 }
 
-// ─── Flight Deep Link Helper ──────────────────────────────────────────────
-function buildFlightDeepLink(
-    flight: FlightResult,
-    from: Airport,
-    to: Airport,
-    date: string,
-    passengers: number,
-    cabinClass: string
-): string {
-    const d = date;
-    const pax = passengers;
-
-    // Detect airline and return best booking URL
-    const code = flight.code?.toUpperCase() ?? "";
-    const airline = flight.airline?.toLowerCase() ?? "";
-
-    // Indian carriers
-    if (code === "AI" || airline.includes("air india"))
-        return `https://www.airindia.com/book-flights.htm?origin=${from.code}&destination=${to.code}&departure=${d}&adults=${pax}`;
-
-    if (code === "6E" || airline.includes("indigo"))
-        return `https://www.goindigo.in/flight-booking.html?origin=${from.code}&destination=${to.code}&departure=${d}&adult=${pax}`;
-
-    if (code === "SG" || airline.includes("spicejet"))
-        return `https://www.spicejet.com/?from=${from.code}&to=${to.code}&date=${d}&adults=${pax}`;
-
-    if (code === "UK" || airline.includes("vistara"))
-        return `https://www.airvistara.com/in/en/flight-booking?origin=${from.code}&destination=${to.code}&departure=${d}&adults=${pax}`;
-
-    if (code === "QP" || airline.includes("akasa"))
-        return `https://www.akasaair.com/booking?from=${from.code}&to=${to.code}&date=${d}&adult=${pax}`;
-
-    // International carriers
-    if (code === "EK" || airline.includes("emirates"))
-        return `https://www.emirates.com/us/english/booking/flights/?origin=${from.code}&destination=${to.code}&ddate=${d}&adults=${pax}`;
-
-    if (code === "SQ" || airline.includes("singapore"))
-        return `https://www.singaporeair.com/en_UK/us/plan-travel/flights/search-flights/?origin=${from.code}&destination=${to.code}&type=O&adult=${pax}`;
-
-    if (code === "QR" || airline.includes("qatar"))
-        return `https://www.qatarairways.com/en/homepage.html`;
-
-    if (code === "EY" || airline.includes("etihad"))
-        return `https://www.etihad.com/en/fly-etihad/book`;
-
-    if (code === "TG" || airline.includes("thai"))
-        return `https://www.thaiairways.com/en_TH/flights/book_fly/flight_booking.page`;
-
-    // Global fallback — Google Flights
-    return `https://www.google.com/travel/flights?q=Flights+from+${from.code}+to+${to.code}+on+${d}&adults=${pax}&cabin=${cabinClass}`;
-}
-
 // ─── View enum ────────────────────────────────────────────────────────────
 type View = "search" | "results";
 
 // ─── Main component ───────────────────────────────────────────────────────
 export default function FlightsPage() {
+    const router = useRouter();
     const [view, setView] = useState<View>("search");
 
     // Form state
@@ -333,6 +261,28 @@ export default function FlightsPage() {
         } finally {
             setSearching(false);
         }
+    };
+
+    const handleSelectFlight = (flight: FlightResult) => {
+        const selection: FlightSelection = {
+            selectedAt: new Date().toISOString(),
+            search: {
+                from,
+                to,
+                departureDate,
+                returnDate: isOneWay ? null : returnDateVal,
+                passengers,
+                cabinClass,
+                oneWay: isOneWay,
+            },
+            flight,
+        };
+
+        window.sessionStorage.setItem(
+            FLIGHT_SELECTION_STORAGE_KEY,
+            JSON.stringify(selection)
+        );
+        router.push("/booking/flights/review");
     };
 
     // ── Filtered airports for modal ───────────────────────────────────────
@@ -578,22 +528,13 @@ export default function FlightsPage() {
                                             >
                                                 Add to Passport
                                             </button>
-                                            <a
-                                                href={buildFlightDeepLink(
-                                                    recFlight,
-                                                    from,
-                                                    to,
-                                                    departureDate,
-                                                    passengers,
-                                                    cabinClass
-                                                )}
-                                                target="_blank"
-                                                rel="noreferrer"
+                                            <button
+                                                type="button"
                                                 className={styles.bookBtn}
-                                                style={{ textDecoration: "none" }}
+                                                onClick={() => handleSelectFlight(recFlight)}
                                             >
-                                                Book This Flight →
-                                            </a>
+                                                Continue in Pragati Setu →
+                                            </button>
                                         </div>
                                     </div>
                                 </div>
@@ -602,7 +543,7 @@ export default function FlightsPage() {
                             {/* All results */}
                             <div className={styles.resultsHeader}>
                                 <span className={styles.resultsCount}>All available flights ({flightResults.length})</span>
-                                <span className={styles.resultsMeta}>Price per passenger, inclusive of taxes.</span>
+                                <span className={styles.resultsMeta}>Price per passenger, inclusive of taxes. Selected fares are revalidated with Amadeus before booking.</span>
                             </div>
 
                             {otherFlights.map(flight => (
@@ -641,22 +582,13 @@ export default function FlightsPage() {
 
                                     <div className={styles.cardRight}>
                                         <div className={styles.cardPrice}>{flight.price}</div>
-                                        <a
-                                            href={buildFlightDeepLink(
-                                                flight,
-                                                from,
-                                                to,
-                                                departureDate,
-                                                passengers,
-                                                cabinClass
-                                            )}
-                                            target="_blank"
-                                            rel="noreferrer"
+                                        <button
+                                            type="button"
                                             className={styles.selectBtn}
-                                            style={{ textDecoration: "none" }}
+                                            onClick={() => handleSelectFlight(flight)}
                                         >
-                                            Select →
-                                        </a>
+                                            Review in App →
+                                        </button>
                                     </div>
                                 </div>
                             ))}
@@ -689,7 +621,7 @@ export default function FlightsPage() {
                         </h1>
                         <p className={styles.heroSubtitle}>
                             Intelligence-scored options from {from.city} to {to.city}.
-                            Confidence-ranked for your safety.
+                            Amadeus-powered search, ranked for confidence and safety.
                         </p>
                     </div>
 

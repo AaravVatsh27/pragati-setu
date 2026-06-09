@@ -1,5 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { sql } from '@/lib/db';
+import { query } from '@/lib/db';
+
+interface AirportSearchRow {
+    id: number;
+    name: string;
+    iata_code: string;
+    city_id: number | null;
+    city_name: string | null;
+    country_name: string | null;
+}
 
 export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
@@ -12,7 +21,8 @@ export async function GET(req: NextRequest) {
 
     try {
         const queryTerm = `%${q}%`;
-        const data = await sql`
+        const data = await query<AirportSearchRow>(
+            `
             SELECT
                 a.id,
                 a.name,
@@ -22,12 +32,13 @@ export async function GET(req: NextRequest) {
                 NULL::text as country_name
             FROM airports a
             LEFT JOIN cities c ON a.city_id = c.id
-            WHERE a.name ILIKE ${queryTerm} OR a.iata_code ILIKE ${queryTerm}
-            LIMIT ${limit}
-        `;
+            WHERE a.name ILIKE $1 OR a.iata_code ILIKE $1
+            LIMIT $2
+        `,
+            [queryTerm, limit]
+        );
 
-        // Transform results to match old the shape if necessary
-        const formattedData = data.map((row: Record<string, unknown>) => ({
+        const formattedData = data.map((row) => ({
             id: row.id,
             name: row.name,
             iata_code: row.iata_code,

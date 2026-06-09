@@ -9,6 +9,7 @@ import {
     formatPrice,
     getAirlineName,
 } from '@/lib/amadeus';
+import type { FlightResult } from '@/lib/flights';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -57,7 +58,7 @@ export async function GET(req: NextRequest) {
         }
 
         // Transform Amadeus response to shape the flights page expects
-        const flights = raw.map(
+        const flights: FlightResult[] = raw.map(
             (offer: Record<string, unknown>, index: number) => {
                 const itineraries = offer.itineraries as Record<string, unknown>[];
                 const outbound = itineraries?.[0];
@@ -119,6 +120,7 @@ export async function GET(req: NextRequest) {
                     reason: index === 0
                         ? `${getAirlineName(carrierCode)} — ${stopsLabel} · ${duration} · Best value for this route.`
                         : undefined,
+                    amadeusOffer: offer,
                 };
             }
         );

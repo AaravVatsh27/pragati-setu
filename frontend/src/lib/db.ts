@@ -1,9 +1,17 @@
 import { neon } from '@neondatabase/serverless';
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-let _sql: any = null;
+type NeonClient = ReturnType<typeof neon>;
+type SqlRow = Record<string, unknown>;
+type SqlResult = SqlRow[];
 
-function getDb() {
+interface SqlClient {
+    (strings: TemplateStringsArray, ...values: unknown[]): Promise<SqlResult>;
+    query: NeonClient['query'];
+}
+
+let _sql: NeonClient | null = null;
+
+function getDb(): NeonClient {
     if (!_sql) {
         if (!process.env.DATABASE_URL) {
             throw new Error('DATABASE_URL is not set');
@@ -14,16 +22,24 @@ function getDb() {
 }
 
 // Tagged-template proxy so callers can still write  sql`SELECT ...`
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const sql: any = new Proxy((() => {}) as any, {
-    apply(_target, _thisArg, args) {
-        return getDb()(...args);
+const sqlProxyTarget = ((
+    strings: TemplateStringsArray,
+    ...values: unknown[]
+) => getDb()(strings, ...values) as Promise<SqlResult>) as SqlClient;
+
+export const sql = new Proxy(sqlProxyTarget, {
+    apply(_target, _thisArg, args: [TemplateStringsArray, ...unknown[]]) {
+        const [strings, ...values] = args;
+        return getDb()(strings, ...values) as Promise<SqlResult>;
     },
-    get(_target, prop) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        return (getDb() as any)[prop];
+    get(_target, prop, receiver) {
+        if (prop === 'query') {
+            return getDb().query.bind(getDb());
+        }
+
+        return Reflect.get(sqlProxyTarget as object, prop, receiver);
     },
-});
+}) as SqlClient;
 
 // Type-safe query helper — returns rows array
 export async function query<T>(

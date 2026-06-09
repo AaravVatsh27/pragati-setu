@@ -1,4 +1,9 @@
 import Amadeus from 'amadeus';
+import type {
+    AmadeusFlightOffer,
+    FlightContactInput,
+    FlightTravelerInput,
+} from './flights';
 
 let amadeusClient: Amadeus | null = null;
 type AmadeusMode = 'test' | 'production';
@@ -158,6 +163,129 @@ export async function searchFlights({
             describeAmadeusError(
                 error,
                 'Flight search is temporarily unavailable.'
+            )
+        );
+    }
+}
+
+type FlightOffersPricingClient = {
+    flightOffers: {
+        pricing: {
+            post: (
+                payload: Record<string, unknown>,
+                params?: Record<string, string>
+            ) => Promise<{ data?: Record<string, unknown> }>;
+        };
+    };
+};
+
+type FlightOrdersClient = {
+    flightOrders: {
+        post: (payload: Record<string, unknown>) => Promise<{ data?: Record<string, unknown> }>;
+    };
+};
+
+function normalizeUppercase(value: string) {
+    return value.trim().toUpperCase();
+}
+
+function normalizeDigits(value: string) {
+    return value.replace(/\D/g, '');
+}
+
+export async function priceFlightOffer(
+    offer: AmadeusFlightOffer
+) {
+    const amadeus = getAmadeusClient();
+
+    try {
+        const shopping = amadeus.shopping as unknown as FlightOffersPricingClient;
+        const response = await shopping.flightOffers.pricing.post(
+            {
+                data: {
+                    type: 'flight-offers-pricing',
+                    flightOffers: [offer],
+                },
+            },
+            { include: 'credit-card-fees,detailed-fare-rules' }
+        );
+
+        return response.data ?? {};
+    } catch (error) {
+        console.error('Flight pricing error:', error);
+        throw new AmadeusRequestError(
+            describeAmadeusError(
+                error,
+                'Flight pricing is temporarily unavailable.'
+            )
+        );
+    }
+}
+
+export async function createFlightOrder({
+    pricedOffer,
+    travelers,
+    contact,
+}: {
+    pricedOffer: AmadeusFlightOffer;
+    travelers: FlightTravelerInput[];
+    contact: FlightContactInput;
+}) {
+    const amadeus = getAmadeusClient();
+
+    try {
+        const booking = (
+            amadeus as unknown as { booking: FlightOrdersClient }
+        ).booking;
+        const response = await booking.flightOrders.post({
+            data: {
+                type: 'flight-order',
+                flightOffers: [pricedOffer],
+                travelers: travelers.map((traveler, index) => ({
+                    id: String(index + 1),
+                    dateOfBirth: traveler.dateOfBirth,
+                    name: {
+                        firstName: normalizeUppercase(traveler.firstName),
+                        lastName: normalizeUppercase(traveler.lastName),
+                    },
+                    gender: normalizeUppercase(traveler.gender),
+                    ...(index === 0 ? {
+                        contact: {
+                            emailAddress: contact.email.trim(),
+                            phones: [
+                                {
+                                    deviceType: 'MOBILE',
+                                    countryCallingCode: normalizeDigits(contact.countryCallingCode),
+                                    number: normalizeDigits(contact.phoneNumber),
+                                },
+                            ],
+                        },
+                    } : {}),
+                    documents: [
+                        {
+                            documentType: normalizeUppercase(traveler.documentType),
+                            birthPlace: traveler.birthPlace.trim(),
+                            issuanceLocation: traveler.issuanceLocation.trim(),
+                            issuanceDate: traveler.issuanceDate,
+                            number: traveler.documentNumber.trim(),
+                            expiryDate: traveler.expiryDate,
+                            issuanceCountry: normalizeUppercase(traveler.issuanceCountry),
+                            validityCountry: normalizeUppercase(traveler.validityCountry),
+                            nationality: normalizeUppercase(traveler.nationality),
+                            holder: true,
+                        },
+                    ],
+                })),
+            },
+        });
+
+        return response.data ?? {};
+    } catch (error) {
+        console.error('Flight booking error:', error);
+        throw new AmadeusRequestError(
+            describeAmadeusError(
+                error,
+                'Flight booking is temporarily unavailable.'
             )
         );
     }

@@ -10,12 +10,13 @@ function getSafeRelativePath(value: string | null) {
 }
 
 function getPreferredBaseUrl(baseUrl: string) {
+    const configuredUrl = process.env.AUTH_URL ?? process.env.NEXTAUTH_URL ?? null;
     const vercelUrl = process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null;
     const productionUrl = process.env.VERCEL_PROJECT_PRODUCTION_URL
         ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
         : null;
 
-    for (const candidate of [vercelUrl, productionUrl, baseUrl]) {
+    for (const candidate of [configuredUrl, productionUrl, baseUrl, vercelUrl]) {
         if (!candidate) continue;
         try {
             return new URL(candidate).toString();
@@ -25,6 +26,22 @@ function getPreferredBaseUrl(baseUrl: string) {
     }
 
     return baseUrl;
+}
+
+function getGoogleProvider() {
+    const clientId = process.env.GOOGLE_CLIENT_ID ?? process.env.AUTH_GOOGLE_ID;
+    const clientSecret = process.env.GOOGLE_CLIENT_SECRET ?? process.env.AUTH_GOOGLE_SECRET;
+
+    if (!clientId || !clientSecret) {
+        return [];
+    }
+
+    return [
+        GoogleProvider({
+            clientId,
+            clientSecret,
+        }),
+    ];
 }
 
 export const authConfig = {
@@ -37,12 +54,7 @@ export const authConfig = {
         error: '/login',
     },
     trustHost: true,
-    providers: [
-        GoogleProvider({
-            clientId: process.env.GOOGLE_CLIENT_ID!,
-            clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
-        }),
-    ],
+    providers: getGoogleProvider(),
     callbacks: {
         authorized({ auth, request: { nextUrl } }) {
             const isLoggedIn = !!auth?.user;
