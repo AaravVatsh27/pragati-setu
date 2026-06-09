@@ -9,7 +9,11 @@ const Word = ({ children, progress, range }: { children: string; progress: Motio
         <span className="relative mr-3 lg:mr-5 inline-block">
             {/* aria-hidden prevents this ghost from being read twice by screen readers
                 and from appearing doubled in SSR/crawlers/plain-text renders */}
-            <span className="absolute opacity-20" aria-hidden="true">{children}</span>
+            <span
+                className="absolute opacity-20"
+                aria-hidden="true"
+                style={{ userSelect: "none", pointerEvents: "none" }}
+            >{children}</span>
             <motion.span style={{ opacity }}>{children}</motion.span>
         </span>
     );
