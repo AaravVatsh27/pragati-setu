@@ -6,10 +6,7 @@ import { motion, useScroll, useTransform, MotionValue } from "framer-motion";
 const Word = ({ children, progress, range }: { children: string; progress: MotionValue<number>; range: [number, number] }) => {
     const opacity = useTransform(progress, range, [0.2, 1]);
     return (
-        <span
-            data-word={children}
-            className="relative mr-3 inline-block before:pointer-events-none before:absolute before:inset-0 before:select-none before:content-[attr(data-word)] before:opacity-20 lg:mr-5"
-        >
+        <span className="relative mr-3 inline-block lg:mr-5">
             <motion.span style={{ opacity }}>{children}</motion.span>
         </span>
     );

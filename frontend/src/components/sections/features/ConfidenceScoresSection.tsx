@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
-import { motion, useSpring, useMotionValue, useTransform, useInView } from "framer-motion";
+import React from "react";
+import { motion, useSpring, useMotionValue, useTransform } from "framer-motion";
 import Link from "next/link";
 import {
     Sun,
@@ -11,45 +11,7 @@ import {
     Wallet
 } from "@phosphor-icons/react";
 
-const ScoreNumber = ({ value, delay }: { value: number; delay: number }) => {
-    const [displayValue, setDisplayValue] = useState(value);
-    const [hasMounted, setHasMounted] = useState(false);
-    const ref = useRef(null);
-    const isInView = useInView(ref, { once: true });
-
-    useEffect(() => {
-        setHasMounted(true);
-    }, []);
-
-    useEffect(() => {
-        if (!hasMounted || !isInView) return;
-
-        setDisplayValue(0);
-        const duration = 2000;
-        const startTime = performance.now();
-
-        const animate = (currentTime: number) => {
-            const elapsed = currentTime - startTime;
-            if (elapsed < delay * 1000) {
-                requestAnimationFrame(animate);
-                return;
-            }
-
-            const progress = Math.min((elapsed - delay * 1000) / duration, 1);
-            const easedProgress = 1 - Math.pow(1 - progress, 3);
-            setDisplayValue(Math.floor(easedProgress * value));
-
-            if (progress < 1) {
-                requestAnimationFrame(animate);
-            } else {
-                setDisplayValue(value);
-            }
-        };
-        requestAnimationFrame(animate);
-    }, [hasMounted, isInView, value, delay]);
-
-    return <span ref={ref}>{displayValue}</span>;
-};
+const ScoreNumber = ({ value }: { value: number }) => <span>{value}</span>;
 
 const ConfidenceCard = ({
     icon: Icon,
@@ -131,7 +93,7 @@ const ConfidenceCard = ({
 
                 <div className="flex items-baseline gap-1 mb-4">
                     <span className={`text-[72px] font-display font-bold leading-none ${colorClass}`}>
-                        <ScoreNumber value={score} delay={index * 0.15} />
+                        <ScoreNumber value={score} />
                     </span>
                     <span className="font-mono text-sm text-text-secondary">/100</span>
                 </div>
