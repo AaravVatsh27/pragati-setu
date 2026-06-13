@@ -6,14 +6,10 @@ import { motion, useScroll, useTransform, MotionValue } from "framer-motion";
 const Word = ({ children, progress, range }: { children: string; progress: MotionValue<number>; range: [number, number] }) => {
     const opacity = useTransform(progress, range, [0.2, 1]);
     return (
-        <span className="relative mr-3 lg:mr-5 inline-block">
-            {/* aria-hidden prevents this ghost from being read twice by screen readers
-                and from appearing doubled in SSR/crawlers/plain-text renders */}
-            <span
-                className="absolute opacity-20"
-                aria-hidden="true"
-                style={{ userSelect: "none", pointerEvents: "none" }}
-            >{children}</span>
+        <span
+            data-word={children}
+            className="relative mr-3 inline-block before:pointer-events-none before:absolute before:inset-0 before:select-none before:content-[attr(data-word)] before:opacity-20 lg:mr-5"
+        >
             <motion.span style={{ opacity }}>{children}</motion.span>
         </span>
     );

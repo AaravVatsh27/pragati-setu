@@ -418,13 +418,13 @@ export default function GuidesPageClient({
                         <span className={styles.becomeTitleAccent}>Share it.</span>
                     </h2>
                     <p className={styles.becomeDesc}>
-                        Earn ₹25,000–₹80,000/month helping Indian travelers experience your city like a local. Flexible hours. Your rules.
+                        Set your own rates per session. Help Indian travelers experience your city like a local. Flexible hours. Your rules.
                     </p>
                 </div>
                 <div className={styles.becomeRight}>
                     <div className={styles.earnStat}>
-                        <div className={styles.earnNum}>₹25K+</div>
-                        <div className={styles.earnLabel}>MONTHLY AVERAGE EARNINGS</div>
+                        <div className={styles.earnNum}>₹299+</div>
+                        <div className={styles.earnLabel}>PER SESSION, YOU SET THE RATE</div>
                     </div>
                     <button
                         className={styles.btnPrimary}

@@ -235,15 +235,20 @@ function buildHeroStats(
     const verifiedCount = guideRows.filter(
         (guide) => guide.verification_status === "verified"
     ).length;
-    const verifiedPct = guideRows.length
-        ? Math.round((verifiedCount / guideRows.length) * 100)
-        : 0;
 
     return [
-        { value: String(languages), label: "LANGUAGES" },
-        { value: String(cities), label: "CITIES COVERED" },
-        { value: `${verifiedPct}%`, label: "BG VERIFIED" },
-        { value: String(guides.length), label: "ACTIVE GUIDES" },
+        { value: String(languages), label: languages === 1 ? "Language" : "Languages" },
+        { value: String(cities), label: cities === 1 ? "City Covered" : "Cities Covered" },
+        verifiedCount > 0
+            ? {
+                value: String(verifiedCount),
+                label: verifiedCount === 1 ? "Verified Guide" : "Verified Guides",
+            }
+            : { value: "100%", label: "Guarantee Backed" },
+        {
+            value: String(guides.length),
+            label: guides.length === 1 ? "Active Guide" : "Active Guides",
+        },
     ];
 }
 

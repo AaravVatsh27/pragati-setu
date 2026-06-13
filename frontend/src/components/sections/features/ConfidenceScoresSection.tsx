@@ -12,12 +12,19 @@ import {
 } from "@phosphor-icons/react";
 
 const ScoreNumber = ({ value, delay }: { value: number; delay: number }) => {
-    const [displayValue, setDisplayValue] = useState(0);
+    const [displayValue, setDisplayValue] = useState(value);
+    const [hasMounted, setHasMounted] = useState(false);
     const ref = useRef(null);
     const isInView = useInView(ref, { once: true });
 
     useEffect(() => {
-        if (!isInView) return;
+        setHasMounted(true);
+    }, []);
+
+    useEffect(() => {
+        if (!hasMounted || !isInView) return;
+
+        setDisplayValue(0);
         const duration = 2000;
         const startTime = performance.now();
 
@@ -34,10 +41,12 @@ const ScoreNumber = ({ value, delay }: { value: number; delay: number }) => {
 
             if (progress < 1) {
                 requestAnimationFrame(animate);
+            } else {
+                setDisplayValue(value);
             }
         };
         requestAnimationFrame(animate);
-    }, [isInView, value, delay]);
+    }, [hasMounted, isInView, value, delay]);
 
     return <span ref={ref}>{displayValue}</span>;
 };
